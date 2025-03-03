@@ -1,111 +1,119 @@
- document.body.style.backgroundColor = "grey";
- document.querySelector("table").style.border = "5px dotted black";
- document.querySelector("table").style.color = "white";
- document.querySelectorAll("th", "td").forEach(cell => {
-    cell.style.border = "3px dotted black";
- });
-
-//state - based on result data type (array, string, object)
+// State holds the event data
 let state = {
-    allEvents: [],
-    singleEventDetails: {}
-}
+    events: []
+};
 
-//1. Get all events from API to list on the website
-const fetchEvents = async () => {
+// Get all events from API to display on the website
+async function fetchEvents() {
+    const api = "https://fsa-crud-2aa9294fe819.herokuapp.com/api/2412-ftb-mt-web-pt/events";
     try {
-        const response = await fetch ('https://fsa-crud-2aa9294fe819.herokuapp.com/api/COHORT_CODE/events');
-        const data = await response.json();
-        state.allEvents = data.results;
-        //console.log(allEvents);
-        //displayAllEvents(allEvents);
+        const response = await fetch(api);
+        const events = await response.json();
+        state.events = events; // Update the state with the fetched events
+        displayEvents(); // Re-render the events list from the state
     } catch (error) {
-        alert('Failed to fetch parties! Please try again later.');
-        //console.error(error);
+        console.log('Failed to fetch events:', error);
     }
 }
 
-const fetchSingleEventDetails = async () => {
-    try {
-        const response = await fetch(`https://fsa-crud-2aa9294fe819.herokuapp.com/api/COHORT_CODE/events${window.location.hash.slice(1)}`);
-        const data = await response.json();
-        state.singleEventDetails = data;
-    } catch (error) {
-        alert('Failed to fetch a single party! Please try again later.');
-        console.error(error)
-    }
-}
+// Display events in the event-table id
+function displayEvents() {
+    const eventsList = document.getElementById('events-list');
+    eventsList.innerHTML = ''; // Clears current events
 
-//Render on the page
-const renderSingleEvent = () => {
-    ulElement.innerHTML = `<li>Name: ${state.singleEventDetails.name}</li>
-    <li>ID: ${state.singlePokemonDetails.id}</li>
-    <li>Height: ${state.singlePokemonDetails.height}</li>`
-}
+    state.events.forEach(event => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${event.name}</td>
+            <td>${event.date}</td>
+            <td>${event.time}</td>
+            <td>${event.location}</td>
+            <td>${event.description}</td>
+            <td><button class="delete-button" data-id="${event.id}">Delete Event</button></td>
+        `;
+        eventsList.appendChild(row);
+    });
 
-const renderEvents = () => {
-    state.allEvents.forEach((event) => {
-        const liElement = document.createElement('li');
-        liElement.innerHTML = `<a>${event.name}</a>`;
-        ulElement.append(liElement);
-    })
-}
-
-fetchEvents()
-renderEvents()
-
-/*function to display all events + add delete button
-const displayAllEvents = () => {
-    const eventsList = document.querySelector('#events-list');
-    eventsList.forEach(eventListed => {
-        const listItem = document.createElement('li');
-        listItem.textContent = event.name; //confirm the .name is correct from the API
-
-        const button = document.createElement('button');
-        button.textContent = 'Delete';
+    // Add delete button eventListener after the list is rendered
+    const deleteButtons = document.querySelectorAll('.delete-button');
+    deleteButtons.forEach(button => {
         button.addEventListener('click', () => {
-            //handle button click action, i.e. delete event
-            console.log('Delete button clicked for event: ${event.name}');
+            const eventId = button.getAttribute('data-id');
+            deleteEvent(eventId);
         });
-        
-        listItem.appendChild(button);
-        eventsList.appendChild(listItem);
     });
 }
 
-//fetch single event
-const fetchSingleEventDetails = async () => {
-    const response = await fetch ('https://fsa-crud-2aa9294fe819.herokuapp.com/api/COHORT_CODE/events')
-}
-
-//render all Events
-const renderEvents = () => {
-    state.example.forEach(event) = () => {
-        console.log(event)
-        const liElement = document.createElement('li')
-        liElement.innerText = event.name
-        ulElement.append(liElement)
-
-        liElement.addEventListener("click", async () => {
-            state.singleEvent = event.name
-            await fetchSingleEventDetails(event.name)
-            renderSingleEvents()
-        })
+// Delete an event from the API and update the state
+async function deleteEvent(eventId) {
+    try {
+        const response = await fetch(`https://fsa-crud-2aa9294fe819.herokuapp.com/api/2412-ftb-mt-web-pt/events/${eventId}`, {
+            method: 'DELETE',
+        });
+        if (response.ok) {
+            // Updates the state to remove the deleted event
+            state.events = state.events.filter(event => event.id !== eventId);
+            displayEvents(); // Re-renders the events list from the updated state
+        } else {
+            console.error('Issue deleting the event');
+        }
+    } catch (error) {
+        console.error('Issue deleting the event:', error);
     }
 }
 
-//render single event
-const renderSingleEvent = () => {
-    ulElement.innerHTML = '<li>Name: ${https://fsa-crud-2aa9294fe819.herokuapp.com}'
+// Form submission to add new event and update the state
+const form = document.querySelector('.form-container');
+form.addEventListener('submit', async (e) => {
+    e.preventDefault(); // Prevents the form from submitting the traditional way
+    const newEvent = {
+        name: document.getElementById('event-name').value,
+        date: document.getElementById('event-date').value,
+        time: document.getElementById('event-time').value,
+        location: document.getElementById('event-location').value,
+        description: document.getElementById('event-description').value,
+        additionalInfo: document.getElementById('additional-info').value,
+    };
+    
+    try {
+        const response = await fetch('https://fsa-crud-2aa9294fe819.herokuapp.com/api/2412-ftb-mt-web-pt/events', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newEvent),
+        });
+
+        if (response.ok) {
+            const eventData = await response.json();
+            // Add the new event to the state
+            state.events.push(eventData);
+            displayEvents(); // Re-renders the events list from the updated state
+
+            // Show the success message
+            displaySuccessMessage('Success! Your event has been added to the Events List.');
+            setTimeout(() => {
+                window.location.reload(); // The page redirects to the main events list after 10 seconds
+            }, 10000); 
+        } else {
+            console.error('Issue adding the event:', error);
+        }
+    } catch (error) {
+        console.error('Issue submitting the new event:', error);
+    }
+});
+
+// Display the success message
+function displaySuccessMessage(message) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('success-message');
+    messageDiv.innerText = message;
+    document.body.appendChild(messageDiv);
+
+    setTimeout(() => {
+        messageDiv.remove(); // Removes the message after 10 seconds
+    }, 10000);
 }
 
-
-//init
-const init = async () => {
-    await getEvents()
-}
-
-init() 
-*/
-
-//renderEvents()
+// Initial loading of events
+fetchEvents();

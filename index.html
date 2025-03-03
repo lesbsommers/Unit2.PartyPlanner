@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+    <!--<link rel="stylesheet" href="styles.css">-->
     <title>Event Parties</title>
 </head>
 
 <body>
     <h1 id="page-title">Parties That Are Happening!</h1>
-    <table>
+    <table id="event-table">
         <thead>
             <tr>
                 <th scope="col">Name</th>
@@ -18,15 +18,16 @@
                 <th scope="col">Time</th>
                 <th scope="col">Location</th>
                 <th scope="col">Description</th>
+                <th scope="col">Actions</th><!--column for delete button-->
             </tr>
         </thead>
         <tbody id="events-list">
-            <!--enter events here into <tr>-->
+            <!--enter events here into <tbody> <tr>-->
         </tbody>
     </table>
     <div>
-        <h1 id="form-title">Event Registration</h1>
         <form class="form-container" action="/submit" method="POST">
+            <h1 id="form-title">Event Registration</h1>
             <label for="event-name">Event Name:</label><br>
             <input type="text" id="event-name" name="event-name" required><br><br>
 
@@ -49,7 +50,7 @@
         </form>
     </div>
 
-    <script src="./script.js"></script>
+    <script src="script.js"></script>
 </body>
 
 </html>
