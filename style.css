@@ -1,50 +1,152 @@
-/**Form*/
-.form-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: black;
-    width: 50%;
-    margin-bottom: 20%;
-    margin-left: 20%;
-    box-sizing: content-box;
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    background-color: hsl(0, 0%, 100%);
-    border: 4px solid hsla(190, 67%, 45%, 0.377);
-  }
-
-#form-title {
-  font-size: 18px;
-  margin-bottom: 15px;
-  text-align: center;
+/* General body styling */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+  background-color: rgb(251, 251, 251);
 }
 
-label {
-  font-weight: bold;
-  display: block;
-  margin-bottom: 5px;
+#page-title {
+  font-size: 3rem;                     /* Make the title larger */
+  background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet); /* Rainbow gradient */
+  -webkit-background-clip: text;        /* Clip the background to the text */
+  color: transparent;                   /* Make text color transparent so the gradient is visible */
+  text-align: center;                   /* Center-align the title */
+  font-weight: bold;                    /* Bold the title for emphasis */
+  margin-bottom: 20px;                  /* Space below the title */
+  padding: 10px;                        /* Padding for better appearance */
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
 }
 
-input,
-textarea,
-button {
+
+/* Container to hold both form and events */
+.container {
+  display: flex;               /* Flexbox layout for the container */
+  justify-content: space-between;  /* Space between the form and events */
+  gap: 40px;                   /* Adds space between the form and events */
+  max-width: 1200px;           /* Optional: Limits the container's max width */
   width: 100%;
-  padding: 8px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
+  margin-top: 20px;
 }
 
-input:hover {
-    border-color: hsla(190, 67%, 45%, 0.377);
-  }
+/* Style for the form container (left side) */
+.form-container {
+  flex: 1;                     /* Form takes available space */
+  max-width: 60%;              /* Optional: Limits the max width of the form */
+  padding: 20px;
+  background-color: #c7ab10;   /* Light background color for the form */
+  border-radius: 8px;          /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow for effect */
+}
 
-button {
-  background-color: #4caf50;
+/* Style for the events container (right side) */
+#event-table {
+  flex: 1;                     /* Events list takes available space */
+  max-width: 50%;              /* Optional: Limits the max width of the events table */
+  padding: 20px;
+  background-color: #6395da;   /* Light background color for the table */
+  border-radius: 8px;          /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow for effect */
+  overflow-y: auto;            /* Allows scrolling if the table overflows */
+}
+
+/* Form input and button styling */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 50%;
+}
+#form-title {
+  font-family: cursive;
+  color:rgb(255, 255, 255);
+  text-align: center;
+  font-weight: 900;
+
+}
+
+/* Add padding to the form inputs */
+input[type="text"], input[type="date"], input[type="time"], textarea {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+/* Style for the submit button */
+button[type="submit"] {
+  padding: 10px;
+  background-color: whitesmoke; /* button color */
+  color: black;
+  border: dotted;
+  border-radius: 4px;
+  border-color: rgb(4, 199, 4);
+  cursor: pointer;
+  font-size: large;
+}
+
+button[type="submit"]:hover {
+  background-color: #d44617; /* Darker green when hovered */
+}
+
+/* Style for the success message */
+.success-message {
+  font-size: 2em; /* Makes the text large */
+  color: red; /* Red color for the text */
+  font-weight: bold; /* Makes the text bold */
+  text-align: center; /* Centers the text */
+  margin-bottom: 20px; /* Adds some space below the success message */
+  padding: 10px; /* Adds padding around the message */
+  background-color: #f8d7da; /* A light red background */
+  border: 2px solid red; /* Red border to match the text */
+  border-radius: 5px; /* Rounded corners for the success message */
+}
+
+/* Optional: You can also add a transition for smooth appearance */
+.success-message {
+  animation: fadeIn 2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  0% {
+      opacity: 0;
+  }
+  100% {
+      opacity: 1;
+  }
+}
+
+/* Style for the event table */
+table {
+  width: 100%;
+  border-collapse:separate
+}
+
+table, th, td {
+  border: 1px solid #ddd;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #f0f0f0;
+}
+
+/* Style for the delete button in events list */
+.delete-button {
+  background-color: red;
   color: white;
   border: none;
+  padding: 5px 10px;
   cursor: pointer;
+}
+
+.delete-button:hover {
+  background-color: darkred;
 }

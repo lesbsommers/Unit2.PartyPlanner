@@ -1,4 +1,3 @@
-// State holds the event data
 let state = {
     events: []
 };
@@ -9,11 +8,18 @@ async function fetchEvents() {
     try {
         const response = await fetch(api);
         const events = await response.json();
-        state.events = events; // Update the state with the fetched events
+        state.events = events.data; // Update the state with the fetched events
         displayEvents(); // Re-render the events list from the state
     } catch (error) {
         console.log('Failed to fetch events:', error);
     }
+}
+
+// Format date to a readable format
+function formatDate(dateString) {
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', options);
 }
 
 // Display events in the event-table id
@@ -25,8 +31,8 @@ function displayEvents() {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${event.name}</td>
-            <td>${event.date}</td>
-            <td>${event.time}</td>
+            <td>${formatDate(event.date)}</td>
+            <td>${event.date.slice(11, 16)}</td> <!-- Extract time from the date string -->
             <td>${event.location}</td>
             <td>${event.description}</td>
             <td><button class="delete-button" data-id="${event.id}">Delete Event</button></td>
@@ -50,15 +56,18 @@ async function deleteEvent(eventId) {
         const response = await fetch(`https://fsa-crud-2aa9294fe819.herokuapp.com/api/2412-ftb-mt-web-pt/events/${eventId}`, {
             method: 'DELETE',
         });
-        if (response.ok) {
-            // Updates the state to remove the deleted event
+
+        if (response.status === 204) {
+            console.log('Event deleted successfully');
             state.events = state.events.filter(event => event.id !== eventId);
-            displayEvents(); // Re-renders the events list from the updated state
+            displayEvents(); // Re-render the events list from the updated state
         } else {
-            console.error('Issue deleting the event');
+            const responseBody = await response.json();
+            console.log('Response Body:', responseBody);
+            console.error('Error deleting event:', responseBody);
         }
     } catch (error) {
-        console.error('Issue deleting the event:', error);
+        console.error('Error deleting event:', error);
     }
 }
 
@@ -68,13 +77,11 @@ form.addEventListener('submit', async (e) => {
     e.preventDefault(); // Prevents the form from submitting the traditional way
     const newEvent = {
         name: document.getElementById('event-name').value,
-        date: document.getElementById('event-date').value,
-        time: document.getElementById('event-time').value,
+        date: document.getElementById('event-date').value + 'T' + document.getElementById('event-time').value + ':00.000Z', // Append time to date
         location: document.getElementById('event-location').value,
         description: document.getElementById('event-description').value,
-        additionalInfo: document.getElementById('additional-info').value,
     };
-    
+
     try {
         const response = await fetch('https://fsa-crud-2aa9294fe819.herokuapp.com/api/2412-ftb-mt-web-pt/events', {
             method: 'POST',
@@ -86,15 +93,17 @@ form.addEventListener('submit', async (e) => {
 
         if (response.ok) {
             const eventData = await response.json();
-            // Add the new event to the state
-            state.events.push(eventData);
+            if (eventData.data) {
+                state.events.push(eventData.data);
+            } else {
+                state.events.push(eventData);
+            }
             displayEvents(); // Re-renders the events list from the updated state
 
-            // Show the success message
-            displaySuccessMessage('Success! Your event has been added to the Events List.');
-            setTimeout(() => {
-                window.location.reload(); // The page redirects to the main events list after 10 seconds
-            }, 10000); 
+            displaySuccessMessage('Success! Your event has been added.');
+            
+            // Clear the form fields after submission
+            form.reset(); // This clears all form fields
         } else {
             console.error('Issue adding the event:', error);
         }
